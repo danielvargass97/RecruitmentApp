@@ -1,0 +1,121 @@
+@page
+@model RecruitmentApp.Pages.Candidates.CreateModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<h2>Crear Candidato</h2>
+
+<form method="post">
+    <div>
+        <label asp-for="Candidate.Name"></label>
+        <input asp-for="Candidate.Name" />
+        <span asp-validation-for="Candidate.Name"></span>
+    </div>
+    <div>
+        <label asp-for="Candidate.Surname"></label>
+        <input asp-for="Candidate.Surname" />
+        <span asp-validation-for="Candidate.Surname"></span>
+    </div>
+    <div>
+        <label asp-for="Candidate.BirthDate"></label>
+        <input asp-for="Candidate.BirthDate" type="date" />
+        <span asp-validation-for="Candidate.BirthDate"></span>
+    </div>
+    <div>
+        <label asp-for="Candidate.Email"></label>
+        <input asp-for="Candidate.Email" type="email" />
+        <span asp-validation-for="Candidate.Email"></span>
+    </div>
+
+    <h3>Experiencias</h3>
+    <div id="experiences-container">
+        @for (int i = 0; i < Model.Candidate.CandidateExperiences.Count; i++)
+        {
+            <div class="experience-item" data-index="@i" style="border:1px solid #ccc; padding:10px; margin-bottom:10px; position:relative;">
+                <label>Compañía</label>
+                <input name="Candidate.CandidateExperiences[@i].Company" value="@Model.Candidate.CandidateExperiences[i].Company" />
+
+                <label>Trabajo</label>
+                <input name="Candidate.CandidateExperiences[@i].Job" value="@Model.Candidate.CandidateExperiences[i].Job" />
+
+                <label>Descripción</label>
+                <textarea name="Candidate.CandidateExperiences[@i].Description">@Model.Candidate.CandidateExperiences[i].Description</textarea>
+
+                <label>Salario</label>
+                <input name="Candidate.CandidateExperiences[@i].Salary" type="number" step="0.01" value="@Model.Candidate.CandidateExperiences[i].Salary" />
+
+                <label>Fecha inicio</label>
+                <input name="Candidate.CandidateExperiences[@i].BeginDate" type="date" value="@(Model.Candidate.CandidateExperiences[i].BeginDate.ToString("yyyy-MM-dd") ?? "")" />
+
+                <label>Fecha fin</label>
+                <input name="Candidate.CandidateExperiences[@i].EndDate" type="date" value="@(Model.Candidate.CandidateExperiences[i].EndDate?.ToString("yyyy-MM-dd") ?? "")" />
+
+                <button type="button" class="remove-experience" style="position:absolute; top:5px; right:5px;">Eliminar</button>
+            </div>
+        }
+    </div>
+
+    <button type="button" onclick="addExperience()" style="margin-top:10px;">Agregar experiencia</button>
+
+    <br /><br />
+    <button type="submit">Guardar</button>
+    <a asp-page="Index"><button type="button">Cancelar</button></a>
+</form>
+
+<script>
+    let experienceIndex = @Model.Candidate.CandidateExperiences.Count;
+
+    function addExperience() {
+        const container = document.getElementById('experiences-container');
+        const div = document.createElement('div');
+        div.className = 'experience-item';
+        div.style = "border:1px solid #ccc; padding:10px; margin-bottom:10px; position:relative;";
+        div.setAttribute('data-index', experienceIndex);
+
+        div.innerHTML = `
+            <label>Compañía</label>
+            <input name="Candidate.CandidateExperiences[${experienceIndex}].Company" />
+
+            <label>Trabajo</label>
+            <input name="Candidate.CandidateExperiences[${experienceIndex}].Job" />
+
+            <label>Descripción</label>
+            <textarea name="Candidate.CandidateExperiences[${experienceIndex}].Description"></textarea>
+
+            <label>Salario</label>
+            <input name="Candidate.CandidateExperiences[${experienceIndex}].Salary" type="number" />
+
+            <label>Fecha inicio</label>
+            <input name="Candidate.CandidateExperiences[${experienceIndex}].BeginDate" type="date" />
+
+            <label>Fecha fin</label>
+            <input name="Candidate.CandidateExperiences[${experienceIndex}].EndDate" type="date" />
+
+            <button type="button" class="remove-experience" style="position:absolute; top:5px; right:5px;">Eliminar</button>
+        `;
+
+        container.appendChild(div);
+        experienceIndex++;
+    }
+
+    document.getElementById('experiences-container').addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-experience')) {
+            e.target.parentElement.remove();
+            updateIndexes();
+        }
+    });
+
+    function updateIndexes() {
+        const container = document.getElementById('experiences-container');
+        const items = container.querySelectorAll('.experience-item');
+
+        items.forEach((div, i) => {
+            div.setAttribute('data-index', i);
+            div.querySelectorAll('input, textarea').forEach(input => {
+                const name = input.name;
+                const newName = name.replace(/\d+/, i);
+                input.name = newName;
+            });
+        });
+        experienceIndex = items.length;
+    }
+</script>

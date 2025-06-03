@@ -1,0 +1,17 @@
+namespace RecruitmentApp.Domain.Entities
+{
+    public class CandidateExperience
+    {
+        public int Id { get; set; }
+        public int CandidateId { get; set; }
+        public required string Company { get; set; }
+        public required string Job { get; set; }
+        public required string Description { get; set; }
+        public required decimal Salary { get; set; }
+        public required DateTime BeginDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public DateTime? InsertDate { get; set; }
+        public DateTime ModifyDate { get; set; }
+        public Candidate Candidate { get; set; } = null!;
+    }
+}
